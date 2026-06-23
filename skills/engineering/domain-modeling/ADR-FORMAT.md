@@ -22,9 +22,9 @@ Only include these when they add genuine value. Most ADRs won't need them.
 - **Considered Options** — only when the rejected alternatives are worth remembering
 - **Consequences** — only when non-obvious downstream effects need to be called out
 
-## Numbering
+## Numbering (Cynap)
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+`docs/adr/` is governed by `docs/adr/README.md`: **one number, one decision; numbers are permanent once on `main`.** Take the next free number — but do NOT just `ls docs/adr | tail` and increment (that is the documented 2026-06 collision class, where parallel sessions grabbed the same number). On a collision, resolve by **renumbering the lower-cited file** (never reuse or overwrite a number) and record it in the README's renumbering log. **Every ADR you add must also update the `docs/adr/README.md` index table** (Status + Domain columns).
 
 ## When to offer an ADR
 

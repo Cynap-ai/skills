@@ -13,6 +13,19 @@ Don't mock:
 - Internal collaborators
 - Anything you control
 
+## Partial module mocks (vitest — Cynap)
+
+A partial `vi.mock('<module>', ...)` MUST spread the real module and override only the symbol under test:
+
+```typescript
+vi.mock('./flags', async () => ({
+  ...(await vi.importActual('./flags')),
+  getFlag: vi.fn().mockReturnValue(true),
+}));
+```
+
+Omitting the `...(await vi.importActual())` spread replaces the WHOLE module, so consumers importing siblings (e.g. `DEFAULT_FLAGS`) get `undefined` and crash — the documented multi-hour main-RED root cause.
+
 ## Designing for Mockability
 
 At system boundaries, design interfaces that are easy to mock:
