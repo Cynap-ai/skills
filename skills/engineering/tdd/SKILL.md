@@ -106,3 +106,10 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 [ ] Code is minimal for this test
 [ ] No speculative features added
 ```
+
+## Cynap conventions
+
+- **Test runner:** all vitest configs use `pool: 'forks'` + `maxWorkers: 4` (Node 25 + native libsql segfaults under threads; uncapped forks melt the Mac). Never change these.
+- **Targeted-first iteration:** loop with `cynap-sandbox verify --quick` or `tooling/sandbox/with-heavy-lock npx vitest run <path> -t "<name>"`; run the full `cynap-sandbox verify` gate ONCE at the end, never in the inner loop (macOS overload guard). Heavy ops MUST go through `with-heavy-lock` / the self-locking `verify`.
+- **Partial mocks:** a partial `vi.mock(module)` MUST spread `...(await vi.importActual())` — see [mocking.md](mocking.md).
+- **TDD is for clean seams, not runtime paths.** Use it for deterministic-runner steps, classifier/extractor handlers via `MockCynapContext`, and Turso rollups. For handler/dispatch/sandbox-lifecycle/webhook/MCP paths, green tests are necessary but NOT sufficient — the real gate is a bake against real traffic (CloudWatch + `automation_logs`).
