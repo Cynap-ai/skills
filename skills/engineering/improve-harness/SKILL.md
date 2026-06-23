@@ -24,14 +24,15 @@ This ritual mutates your live global harness. **Back up before any mutation** �
 
 ## Process
 
-### 1. Launch the investigation — two parallel dynamic Workflows
+### 1. Launch the investigation — parallel dynamic Workflows
 
-Fan the read-only investigation out into **two background Workflows** so they run while you do nothing. Author them from the templates in [WORKFLOW.md](WORKFLOW.md):
+Fan the read-only investigation out into **parallel background Workflows** so they run while you do nothing. Run **A and B every time**; add **C on a deeper or ~quarterly pass** (the agent-stack landscape moves slowly). Author them from the templates in [WORKFLOW.md](WORKFLOW.md):
 
 - **Workflow A — mine + consolidate.** Session miners over the **past week** of `~/.claude/projects/*/*.jsonl` + `history.jsonl` (extract human turns, corrections, self-flagged mistakes), plus surveyors of every harness surface: **GitHub** (merged PRs, the repos you work across, newly-created repos in your orgs), **Linear** (recent issue comments + status changes), **worktrees** (the in-flight registry; prune candidates), **memory** (`MEMORY.md` + topic-file drift), and a **vendoring + deep-audit** of skills/agents/commands/hooks. → one consolidated, sequenced plan with ranked new lessons + a concrete prune list.
 - **Workflow B — latest + models.** Research the latest version of every **GitHub-derived** plugin, marketplace, and skill, the **CLIs** (Claude Code, Codex, `skills`), and a **model-pin audit** of every `model:` against the current flagship IDs. → a version matrix + ready-to-run upgrade plan.
+- **Workflow C — agent-stack landscape (periodic).** Live-verify the best/newest GitHub agent stacks — subagent collections, orchestration frameworks, frontier SDKs — and gap-analyze our owned agents against them. → a stay/cherry-pick/adopt recommendation. The standing answer is **own + cherry-pick specific roles, never adopt a stack wholesale** (a competing framework violates one-architecture, the same reason we retired OMC/ECC — see [GOTCHAS.md](GOTCHAS.md)).
 
-Both run read-only. **Completion criterion:** both Workflows have returned their structured plans; nothing in the harness has been mutated yet.
+All run read-only. **Completion criterion:** every launched Workflow has returned its structured plan; nothing in the harness has been mutated yet.
 
 ### 2. Reconcile into one sequenced program
 

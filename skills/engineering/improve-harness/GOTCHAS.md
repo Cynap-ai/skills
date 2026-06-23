@@ -38,6 +38,15 @@ Hard-won traps, by phase. Read the relevant block before running that phase of s
 - **Never weaken `~/.claude`'s `.gitignore`.** Confirm `sessions/`, `history.jsonl`, `plugins/`, `shell-snapshots/` stay ignored before `git add -A`. Scan the `settings.json` diff for secrets before committing.
 - Committing `~/.claude` also persists **accumulated memory from prior sessions** that was never committed — that's wanted (it makes the harness canonical), just expect more changed files than you authored.
 
+## Agent-stack adoption (Workflow C)
+
+- **Own + cherry-pick; never adopt a stack wholesale.** Every external agent collection/runtime either ships a competing orchestration layer (fails one-architecture — the OMC/ECC rejection) or is disqualified (dormant / no-license / stale-model-pins). Public sets are flat tech-specialist *catalogs* (a parts bin); our crew is a deep *lifecycle* spine — different question, not "better."
+- **Verify repos LIVE; the npm name lies.** A prior run mis-identified `oh-my-claudecode` as the 2★ npm-name owner (`ragingstar2063`) and wrongly called it dead — the real active project is `Yeachan-Heo/...` v4.x (36.8k★). Always check `stargazers_count`/`pushed_at`/`archived` on the actual repo, and don't trust a stale "dormant" rationale (re-verify each pass).
+- **Port patterns, not repos.** Read a candidate `.md` for its *prompt pattern* only; rewrite from scratch in our `<Agent_Prompt>` house format, re-pin to current model IDs, strip all framework/MCP/collaboration-runtime coupling.
+- **Bake in domain invariants or the agent is net-negative.** This is make-or-break: a generic `postgres-pro` ignorant of Turso delete-protection / the Supabase security gate / schema-first migration ordering is *dangerous* (it'll suggest a drop-recreate). Encode our invariants in the agent's Constraints.
+- **A ported agent is UNVERIFIED until it runs once on a real in-scope task** — and new agent files only load next session, so you can't smoke-test them in the run that creates them. Flag them for first-task verification.
+- **Cap scope.** Add a role only if we BOTH lack it AND exercise it ~weekly; the ml/mobile/k8s long tail is a maintenance trap — skip.
+
 ## Light vs heavy ops
 
 `npx skills`, `claude plugin`, `gh`, `git`, and WebFetch are **light** — they are not the machine-global heavy-lock ops (vitest/build/cdk). Run them directly.
