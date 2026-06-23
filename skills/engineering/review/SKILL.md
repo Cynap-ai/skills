@@ -10,13 +10,15 @@ Two-axis review of the diff between `HEAD` and a fixed point the user supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-The issue tracker should have been provided to you — run `/setup-matt-pocock-skills` if `docs/agents/issue-tracker.md` is missing.
+Spec context lives in **Linear** (issues keyed `CYN-*`), fetched via the Linear MCP (`mcp__linear__get_issue` or `mcp__plugin_linear_linear__get_issue`). This repo has no `docs/agents/issue-tracker.md` and no `/setup-matt-pocock-skills` dependency.
 
 ## Process
 
 ### 1. Pin the fixed point
 
-Whatever the user said is the fixed point — a commit SHA, branch name, tag, `main`, `HEAD~5`, etc. If they didn't specify one, ask for it.
+Whatever the user said is the fixed point — a commit SHA, branch name, tag, `main`, `HEAD~5`, etc. If they didn't specify one, default to `origin/main`.
+
+Run `git fetch origin` first so the fixed point is current — a stale ref manufactures false diffs and phantom contamination (the squash-against-stale-base failure class).
 
 Capture the diff command once: `git diff <fixed-point>...HEAD` (three-dot, so the comparison is against the merge-base). Also note the list of commits via `git log <fixed-point>..HEAD --oneline`.
 
@@ -26,14 +28,14 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 Look for the originating spec, in this order:
 
-1. Issue references in the commit messages (`#123`, `Closes #45`, GitLab `!67`, etc.) — fetch via the workflow in `docs/agents/issue-tracker.md`.
+1. Linear issue refs in the branch name, commit messages, or PR body (`CYN-123`, `Fixes CYN-123`, `Part of CYN-123`) — fetch the issue + its description via the Linear MCP.
 2. A path the user passed as an argument.
-3. A PRD/spec file under `docs/`, `specs/`, or `.scratch/` matching the branch name or feature.
+3. A spec/ADR file under `docs/specs/`, `docs/adr/`, or `docs/roadmap/` matching the branch name or feature.
 4. If nothing is found, ask the user where the spec is. If they say there isn't one, the **Spec** sub-agent will skip and report "no spec available".
 
 ### 3. Identify the standards sources
 
-Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`.
+This repo documents its standards in `CLAUDE.md`/`AGENTS.md` (root — same file, symlinked), `docs/PRODUCT-RULES.md`, and `docs/PLATFORM-INVARIANTS.md`, plus any `CONTEXT.md` and ADRs under `docs/adr/`. Pass these to the Standards sub-agent (there is no `CODING_STANDARDS.md`/`CONTRIBUTING.md`).
 
 ### 4. Spawn both sub-agents in parallel
 

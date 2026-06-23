@@ -164,6 +164,8 @@ Skills I use daily for code work.
 - **[tdd](./skills/engineering/tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
 - **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)** — Actively build and sharpen a project's domain model — challenge terms against the glossary, stress-test with edge-case scenarios, and update `CONTEXT.md` and ADRs inline.
 - **[codebase-design](./skills/engineering/codebase-design/SKILL.md)** — Shared discipline and vocabulary for designing deep modules: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface.
+- **[review](./skills/engineering/review/SKILL.md)** — Two-axis review (Standards vs Spec) of the diff since a fixed point, via parallel sub-agents. Adapted for Cynap: standards from `CLAUDE.md`/`PRODUCT-RULES.md`/`PLATFORM-INVARIANTS.md`, spec from Linear `CYN-*`, fetch-before-diff.
+- **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Recover intent from commits/PRs, resolve each hunk preserving both intents, never `--abort`, run typecheck → tests → format before finishing.
 
 ### Productivity
 
