@@ -1,6 +1,6 @@
 ---
 name: investigation
-description: Ground an external-facing or unfamiliar task in real web facts before acting — a short grounded brief from WebSearch/WebFetch + `site:` lookups of official docs, GitHub, and industry sources (TLDR, HN), after framing it in this codebase. Deciding test — do you need a vendor's DOCS or your own LOGS? Fire generously (over-grounding is cheap; a miss is the costly error) when you need a third-party library/API/framework's documented API, limits, or current version — even if the name is familiar but its current API isn't; on version-currency or deprecation; on approach-selection where a standard shapes the design; on an unfamiliar third-party error; on the fence, fire. Hard-skip (overrides the fire, even when a vendor is named): debugging or baking Cynap's OWN runtime (reconciler/lifecycle/handler/deploy/alarm) — truth is CloudWatch + logs + the codebase; a mechanical one-line diff; pure internal authoring (spec/Linear/memory/PR/git). Escalate to deep mode for broad topics; `deep-research` for a cited report.
+description: Ground an external-facing or unfamiliar task in real web facts before acting - a short grounded brief from WebSearch/WebFetch + `site:` lookups of official docs, GitHub, and industry sources (TLDR, HN), after framing it in this codebase. Deciding test: do you need a vendor's DOCS or your own LOGS? Fire generously (over-grounding is cheap; a miss is the costly error) when you need a third-party library/API/framework's documented API, limits, or version - even if the name is familiar but its current API isn't; on version-currency or deprecation; on approach-selection where a standard applies; on an unfamiliar third-party error; on the fence, fire. Hard-skip (overrides the fire, even when a vendor is named): debugging or baking Cynap's OWN runtime (reconciler/lifecycle/handler/deploy/alarm) - truth is CloudWatch + logs + the codebase; a mechanical one-line diff; pure internal authoring (spec/Linear/memory/PR/git). Escalate to deep mode for broad topics; `deep-research` for a cited report.
 ---
 
 # Investigation
@@ -13,6 +13,8 @@ The deciding test: **do you need a third-party vendor's DOCS, or your own LOGS?*
 
 **Ground** when you need a library/API/SDK/framework's real shape, limits, idioms, or current version (even if the name is familiar but its current API isn't); on version-currency or deprecation ("is X still the way"); on approach-selection where an industry standard shapes the design; on an unfamiliar third-party error. Over-grounding is cheap — on the fence, ground.
 
+**Currency self-check** (the gap topic-class can't see): familiarity is not currency. If your memory of a third-party API/SDK/version predates your knowledge cutoff and the work depends on its *current* shape, ground — you won't feel uncertain about a confidently-remembered-but-changed API, so make currency, not familiarity, the trigger. A borderline tie-breaker; it does not override the hard-skips.
+
 **Hard-skip** (overrides the fire, even when a vendor is named): debugging or baking *our own* runtime — reconciler, lifecycle, handler, sandbox, sign-in, deploy, backup, alarm — where the truth is CloudWatch + logs + this codebase, not the web; a one-sentence mechanical diff (typo, rename, log line); and pure internal authoring (spec, Linear, memory, PR body, git mechanics).
 
 ## The grounding pass — single-context, bounded
@@ -23,7 +25,7 @@ Stay in one context: a handful of targeted queries, then the brief. **Never fan 
 2. **Research (external), seeded by the frame.** Search shaped by the real stack the frame named. Default move: one broad orienting query → `site:`-scoped lookup of the authoritative source → single deep-fetch of the top hit → at most one narrowing follow-up. Prefer primary sources (official docs/changelogs, the source repo, GitHub code search) over the top SEO hit. [`SOURCES.md`](./SOURCES.md) holds the per-source query recipes (GitHub, TLDR, Hacker News, docs, …) and the search gotchas that silently un-ground a brief.
 3. **Write the brief** — a few hundred words (~1–2k tokens), sections: `TL;DR · Problem frame · Industry standard · Elevation (best-in-class) · Tips & gotchas · Recommendations for THIS task · What to research next · Sources`. **One source URL per claim — drop any line you can't ground, and say what you couldn't confirm.** Date-check anything fast-moving and surface the source's date.
 
-Save the brief to `docs/investigations/YYYY-MM-DD-<slug>.md`, post it, then hand off to `/grill-with-docs` — its open questions and recommendations are the grilling's ammunition.
+Save the brief to `docs/investigations/YYYY-MM-DD-<slug>.md` — **create the dir first (`mkdir -p docs/investigations`)**; a bare write to a missing dir silently loses the brief. Open it with a freshness header — `> Grounded <date> against sources current as of <dates>; supersede on re-investigation of this slug` — so a stale "is X current" brief can't mislead later; a same-slug brief supersedes the older one. Then post it and hand off to `/grill-with-docs` — its open questions and recommendations are the grilling's ammunition.
 
 ## Deep mode — on demand, not the default
 
@@ -34,3 +36,7 @@ When even that won't do — every claim cited and cross-checked into a standalon
 ## Done when
 
 The brief exists, every claim carries a source (or is flagged unconfirmed), and it's saved and handed off. A brief padded past ~2k tokens, or carrying an ungrounded assertion, isn't done — it's drifting toward deep-research; cut it back or escalate deliberately.
+
+---
+
+**Maintaining this skill** — the gate-calibration recipe (mine real session openers → confusion-matrix eval), the re-eval cadence, the watched over-fire set, and the install/desync runbook (the `skills` CLI is flaky on this private repo) live in [`MAINTAINING.md`](./MAINTAINING.md). Read it before editing the gate or reinstalling.

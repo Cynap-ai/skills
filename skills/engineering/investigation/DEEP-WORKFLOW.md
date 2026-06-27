@@ -7,12 +7,13 @@ The escalation when one lean pass won't cover the task: a topic broad enough to 
 Three phases, each a fan-out, context flowing forward — the lean pass's `frame → research → brief`, scaled out:
 
 1. **FRAME (internal fan-out)** — parallel reader agents map the premise's own reality: codebase, architecture/constraints, target & goal, prior art. Each claim cites a real `file:line`; a synthesis step distils them into a Problem Frame plus the sharp research questions that seed phase 2.
-2. **RESEARCH (external fan-out, seeded by the Frame)** — one agent per research question, queries shaped by the real stack the Frame named. Each returns structured findings (claims with source URLs, standards, patterns, gotchas). A verify stage adversarially cross-checks load-bearing claims against an independent source.
+2. **RESEARCH (external fan-out, seeded by the Frame)** — one agent per research question, queries shaped by the real stack the Frame named. Each returns structured findings (claims with source URLs, standards, patterns, gotchas). A verify stage adversarially cross-checks load-bearing claims against an independent source — and its verdicts are **enforced in code** (claims partitioned verified vs untrusted before synthesis), not left to the synthesizer's discretion.
 3. **SYNTHESIZE** — merge Frame + verified findings into the brief (same sections as the lean pass), saved to `docs/investigations/`.
 
 ## Guardrails
 
-- **Scale agents to breadth** — 2–3 for a narrow topic, 8–12+ for a broad one. Don't fan out wider than the topic earns.
+- **Scale agents to breadth** — 2–3 for a narrow topic, 8–12+ for a broad one. Don't fan out wider than the topic earns. The template **clamps** research width to `N` (default 4, range 2–12) and slices the model's question list to it, so a malformed frame can't silently fan out 30 agents.
+- **Verify is enforced, not requested** — refuted/unchecked claims are partitioned out *in code* before synthesis, so the synthesizer can only build load-bearing sections from verified claims; every shipped `source_url` is liveness-checked. (Prose-only "mark unverified" is theatre — a refuted claim still lands.)
 - **Gate the same way** — deep mode is still *grounding*; it doesn't fire on a one-sentence diff.
 - **No nested dispatch** — the workflow's agents must not spawn their own sub-agents.
 - **Don't poll** — the run is background; read its result when it completes, never loop waiting on it.
@@ -20,7 +21,9 @@ Three phases, each a fan-out, context flowing forward — the lean pass's `frame
 
 ## Workflow-script template
 
-Adapt for the Workflow tool. Pass the task as `args.premise`; tune the angle and question lists to the topic. Plain JS (no TS); no `Date.now()` / `Math.random()`.
+Adapt for the Workflow tool. Pass the task as `args.premise` (and optional `args.n` to size the fan-out). Plain JS (no TS); no `Date.now()` / `Math.random()`.
+
+**Harness globals** — `phase()`, `parallel()`, `pipeline()`, `agent({label, phase, schema})`, `log()`, and `args` are provided by the Workflow tool, not imported; supply equivalents if you adapt this template elsewhere. The `args`-as-object-or-string parse below is *defensive*: one observed run delivered `args` as a JSON string (the Workflows doc says structured data, so the coercion is harmless when `args` is already an object — not a documented contract). The unconditional wins are the hard-fail-on-empty-premise and the width clamp.
 
 ```js
 export const meta = {
@@ -33,8 +36,11 @@ export const meta = {
   ],
 }
 
-const PREMISE = (args && args.premise) ? args.premise : ''
-if (!PREMISE) log('WARN: no args.premise — pass the task to ground.')
+const A = typeof args === 'string' ? (() => { try { return JSON.parse(args) } catch { return {} } })() : (args || {})
+const PREMISE = (A.premise || '').trim()
+if (!PREMISE) throw new Error('investigation-deep: empty premise — pass the task to ground as args.premise')
+// Clamp fan-out width: default 4 research questions, never <2 or >12. FRAME stays fixed-4 by design.
+const N = Math.min(12, Math.max(2, Number(A.n) || 4))
 
 // ---- Phase 1: FRAME (internal) ----
 phase('Frame')
@@ -124,17 +130,17 @@ const VERIFY_SCHEMA = {
   },
 }
 
-const QUESTIONS = (PROBLEM_FRAME && PROBLEM_FRAME.research_questions) ? PROBLEM_FRAME.research_questions : []
+const QUESTIONS = (((PROBLEM_FRAME && PROBLEM_FRAME.research_questions) || []).slice(0, N)) // clamp model-supplied width
 
 const researched = (await pipeline(
   QUESTIONS,
   (q, _orig, i) => agent(
-    'Research this question, grounded for the task. Use WebSearch/WebFetch (load via ToolSearch "select:WebSearch,WebFetch" if not directly available) + site:-scoped queries; prefer primary sources. Every claim carries a real fetched source_url — drop any you cannot fetch. See the skill SOURCES.md for query recipes & gotchas (a site: miss is inconclusive → retry unscoped; re-issue WebFetch on cross-host redirects).\nFRAME: ' + JSON.stringify(PROBLEM_FRAME) + '\nQUESTION: ' + q,
+    'Research this question to ground the task. FOUR-PART CONTRACT:\n- OBJECTIVE: answer ONLY the one question below.\n- OUTPUT: fill the RESEARCH_SCHEMA — claims (each with a real fetched source_url), standards, patterns, gotchas.\n- SOURCES/TOOLS: WebSearch + WebFetch (load via ToolSearch "select:WebSearch,WebFetch" if needed); use the SOURCES.md tiers, prefer PRIMARY sources (official docs / llms.txt / source repo) over SEO hits; mind the SOURCES.md gotchas (a site: miss is inconclusive → retry unscoped; re-issue WebFetch on cross-host redirects).\n- BOUNDARIES: research only THIS question — do not re-answer sibling questions, do not fan out to sub-agents. Drop any claim whose source you cannot fetch.\nFRAME: ' + JSON.stringify(PROBLEM_FRAME) + '\nQUESTION: ' + q,
     { label: 'research:' + (i + 1), phase: 'Research', schema: RESEARCH_SCHEMA }
   ),
   (res, _q, i) => {
     if (!res) return null
-    const lb = (res.claims || []).slice(0, 3).map(c => '- ' + c.statement + ' [' + c.source_url + ']').join('\n')
+    const lb = (res.claims || []).slice(0, 5).map(c => '- ' + c.statement + ' [' + c.source_url + ']').join('\n')
     if (!lb) return { research: res, verification: null }
     return agent(
       'Adversarially verify these claims — try to REFUTE each; verified=true ONLY if an INDEPENDENT source (different domain than the given one) corroborates. Use WebSearch/WebFetch.\n' + lb,
@@ -145,6 +151,19 @@ const researched = (await pipeline(
 
 // ---- Phase 3: SYNTHESIZE ----
 phase('Synthesize')
+
+// Enforce the verify verdicts IN CODE: partition claims into verified vs refuted/unchecked,
+// so a refuted claim can't silently land as load-bearing (prose "mark unverified" is not enough).
+function verifiedOf(statement, ver) {
+  const v = ver && ver.verdicts && ver.verdicts.find(x => x.claim && statement && x.claim.slice(0, 40) === statement.slice(0, 40))
+  return v ? v.verified === true : false // false = refuted OR unchecked (beyond the verify cap) — both untrusted
+}
+const verifiedClaims = [], untrusted = []
+for (const r of researched) {
+  for (const c of (r.research.claims || [])) {
+    (verifiedOf(c.statement, r.verification) ? verifiedClaims : untrusted).push({ ...c, question: r.research.question })
+  }
+}
 
 const BRIEF_SCHEMA = {
   type: 'object', additionalProperties: false,
@@ -165,7 +184,7 @@ const BRIEF_SCHEMA = {
 }
 
 const brief = await agent(
-  'Synthesize the grounded brief for the task. Fill every section; each industry_standard carries a source; include only grounded claims — drop or mark "(unverified)" anything the verify step did not confirm. sources = deduped file:line + URLs.\n\nTASK:\n' + PREMISE + '\nFRAME:\n' + JSON.stringify(PROBLEM_FRAME) + '\nRESEARCH:\n' + JSON.stringify(researched),
+  'Synthesize the grounded brief for the task. Build load-bearing sections (industry_standard, elevation) ONLY from VERIFIED claims. Treat UNTRUSTED claims as not-fact — drop them or render "(unverified)", never as a standard. Before finalizing, liveness-check every source_url you cite (WebFetch it; if it 404s or is unreachable, drop or flag the claim — dead/fabricated URLs are the top deep-research failure mode). sources = deduped LIVE URLs + file:line.\n\nTASK:\n' + PREMISE + '\nFRAME:\n' + JSON.stringify(PROBLEM_FRAME) + '\nVERIFIED CLAIMS:\n' + JSON.stringify(verifiedClaims) + '\nUNTRUSTED (do not state as fact):\n' + JSON.stringify(untrusted),
   { label: 'synthesize', phase: 'Synthesize', schema: BRIEF_SCHEMA }
 )
 
