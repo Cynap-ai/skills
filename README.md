@@ -167,6 +167,7 @@ Skills I use daily for code work.
 - **[codebase-design](./skills/engineering/codebase-design/SKILL.md)** — Shared discipline and vocabulary for designing deep modules: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface.
 - **[review](./skills/engineering/review/SKILL.md)** — Two-axis review (Standards vs Spec) of the diff since a fixed point, via parallel sub-agents. Adapted for Cynap: standards from `CLAUDE.md`/`PRODUCT-RULES.md`/`PLATFORM-INVARIANTS.md`, spec from Linear `CYN-*`, fetch-before-diff.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** — Recover intent from commits/PRs, resolve each hunk preserving both intents, never `--abort`, run typecheck → tests → format before finishing.
+- **[investigation](./skills/engineering/investigation/SKILL.md)** — Pre-task grounding: a short web-grounded brief (industry standard, best-in-class, tips, recommendations, what to research next) before acting on an unfamiliar task. Lean single-context pass by default; on-demand multi-agent deep mode for broad topics; `deep-research` as the heavier escalation.
 
 ### Productivity
 

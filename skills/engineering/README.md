@@ -10,6 +10,7 @@ Reachable only when you type them (`disable-model-invocation: true`).
 - **[grill-with-docs](./grill-with-docs/SKILL.md)** — Grilling session that also builds your project's domain model, sharpening terminology and updating `CONTEXT.md` and ADRs inline.
 - **[triage](./triage/SKILL.md)** — Move issues through a state machine of triage roles.
 - **[improve-codebase-architecture](./improve-codebase-architecture/SKILL.md)** — Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+- **[improve-harness](./improve-harness/SKILL.md)** — Periodic harness self-improvement ritual: mine recent sessions + survey GitHub/Linear/worktrees/memory via parallel dynamic Workflows, research latest CLI/plugin/skill/model versions, grill the consolidated plan, then execute prune → vendor → upgrade → docs → memory across the harness repos. (Cynap-specific.)
 - **[setup-matt-pocock-skills](./setup-matt-pocock-skills/SKILL.md)** — Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo.
 - **[to-issues](./to-issues/SKILL.md)** — Break any plan, spec, or PRD into independently-grabbable issues using vertical slices.
 - **[to-prd](./to-prd/SKILL.md)** — Turn the current conversation into a PRD and publish it to the issue tracker.
@@ -23,3 +24,6 @@ Model- or user-reachable (rich trigger phrasing so the model can reach for them)
 - **[tdd](./tdd/SKILL.md)** — Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
 - **[domain-modeling](./domain-modeling/SKILL.md)** — Actively build and sharpen a project's domain model — challenge terms, stress-test with scenarios, update `CONTEXT.md` and ADRs inline.
 - **[codebase-design](./codebase-design/SKILL.md)** — Shared discipline and vocabulary for designing deep modules: small interfaces, clean seams, testable through the interface.
+- **[review](./review/SKILL.md)** — Two-axis review (Standards vs Spec) of the diff since a fixed point, via parallel sub-agents. Adapted for Cynap: standards from `CLAUDE.md`/`PRODUCT-RULES.md`/`PLATFORM-INVARIANTS.md`, spec from Linear `CYN-*`, fetch-before-diff.
+- **[resolving-merge-conflicts](./resolving-merge-conflicts/SKILL.md)** — Recover intent from commits/PRs, resolve each hunk preserving both intents, never `--abort`, run typecheck → tests → format before finishing.
+- **[investigation](./investigation/SKILL.md)** — Pre-task grounding: a short web-grounded brief (industry standard, best-in-class, tips, recommendations, what to research next) before acting on an unfamiliar task. Lean single-context pass by default; on-demand multi-agent deep mode for broad topics; `deep-research` as the heavier escalation.
