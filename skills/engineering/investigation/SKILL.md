@@ -1,6 +1,6 @@
 ---
 name: investigation
-description: Ground an unfamiliar task in real external facts before acting — a short web-grounded brief (industry standard, current best-in-class approach, tips, recommendations, what to research next) built from WebSearch/WebFetch + `site:`-scoped lookups of official docs, GitHub, and industry sources (TLDR, Hacker News, …), seeded by first framing the task in this codebase. Use when about to work with an unfamiliar library, API, framework, integration, or fast-moving tool, when choosing an approach where the current standard matters, or when unsure whether "X is still the right way." Skip when the change is a one-sentence diff you could already describe (typo, rename, log line) or the area is already familiar. Escalate to deep mode for broad/high-value topics, and to the `deep-research` skill when every claim must be cited into a standalone report.
+description: Ground an external-facing or unfamiliar task in real web facts before acting — a short grounded brief from WebSearch/WebFetch + `site:` lookups of official docs, GitHub, and industry sources (TLDR, HN), after framing it in this codebase. Deciding test — do you need a vendor's DOCS or your own LOGS? Fire generously (over-grounding is cheap; a miss is the costly error) when you need a third-party library/API/framework's documented API, limits, or current version — even if the name is familiar but its current API isn't; on version-currency or deprecation; on approach-selection where a standard shapes the design; on an unfamiliar third-party error; on the fence, fire. Hard-skip (overrides the fire, even when a vendor is named): debugging or baking Cynap's OWN runtime (reconciler/lifecycle/handler/deploy/alarm) — truth is CloudWatch + logs + the codebase; a mechanical one-line diff; pure internal authoring (spec/Linear/memory/PR/git). Escalate to deep mode for broad topics; `deep-research` for a cited report.
 ---
 
 # Investigation
@@ -9,7 +9,11 @@ Ground an unfamiliar task in real external facts **before** you act. The output 
 
 ## When to ground
 
-Ground when the task touches an **unfamiliar** library, API, framework, integration, or fast-moving tool; when you're choosing an approach where the current industry standard matters; or when you're unsure "is X still the right way." **Skip** a one-sentence diff you could already describe (typo, rename, log line) or an already-familiar area — grounding the known is a no-op tax, and over-firing is this skill's real failure mode.
+The deciding test: **do you need a third-party vendor's DOCS, or your own LOGS?** Vendor docs → ground; your own logs/codebase → skip, even when the task names a vendor.
+
+**Ground** when you need a library/API/SDK/framework's real shape, limits, idioms, or current version (even if the name is familiar but its current API isn't); on version-currency or deprecation ("is X still the way"); on approach-selection where an industry standard shapes the design; on an unfamiliar third-party error. Over-grounding is cheap — on the fence, ground.
+
+**Hard-skip** (overrides the fire, even when a vendor is named): debugging or baking *our own* runtime — reconciler, lifecycle, handler, sandbox, sign-in, deploy, backup, alarm — where the truth is CloudWatch + logs + this codebase, not the web; a one-sentence mechanical diff (typo, rename, log line); and pure internal authoring (spec, Linear, memory, PR body, git mechanics).
 
 ## The grounding pass — single-context, bounded
 
